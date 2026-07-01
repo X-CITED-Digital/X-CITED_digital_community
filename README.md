@@ -16,7 +16,7 @@ This repository stores documents for running the community, including:
 - **Roles** — descriptions of responsibilities within the community
 - **Onboarding** — guidance for new members and organisers
 - **Processes** — step-by-step guides for recurring tasks such as running community meetings
-- **Resources"" — branded images etc
+- **Resources** — branded images etc
 
 ## Joining the community
 
