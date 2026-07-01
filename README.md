@@ -17,6 +17,7 @@ This repository stores documents for running the community, including:
 - **Onboarding** — guidance for new members and organisers
 - **Processes** — step-by-step guides for recurring tasks such as running community meetings
 - **Resources** — branded images etc
+- **Marketing** — outreach resources including a directory of digital communities and facilities across GW4 institutions
 
 ## Joining the community
 
