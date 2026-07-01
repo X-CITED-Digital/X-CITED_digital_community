@@ -1,0 +1,241 @@
+name: Create Community Meeting Sub-Issues
+
+on:
+  issues:
+    types:
+      - opened
+      - labeled
+
+# Prevent duplicate runs for the same issue
+concurrency:
+  group: meeting-sub-issues-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  create-sub-issues:
+    # Run when:
+    #   • An issue is opened and already carries the community-meeting label
+    #     (e.g. created via the issue template which auto-applies the label), OR
+    #   • The community-meeting label is applied to an existing issue
+    if: |
+      (github.event.action == 'opened' && contains(github.event.issue.labels.*.name, 'community-meeting')) ||
+      (github.event.action == 'labeled'  && github.event.label.name == 'community-meeting')
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+
+    steps:
+      - name: Create phase sub-issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner          = context.repo.owner;
+            const repo           = context.repo.repo;
+            const parentNumber   = context.issue.number;
+            const parentTitle    = context.payload.issue.title;
+
+            // ── Guard: skip if sub-issues were already created ────────────────
+            const { data: existingComments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: parentNumber,
+            });
+            if (existingComments.some(c => c.body.includes('<!-- meeting-sub-issues-created -->'))) {
+              console.log('Sub-issues already created for this meeting. Skipping.');
+              return;
+            }
+
+            // ── Phase definitions ─────────────────────────────────────────────
+            const phases = [
+              {
+                label:      'community-meeting:6-weeks-before',
+                labelColor: 'c5def5',
+                title:      `[6 weeks before] ${parentTitle}`,
+                body: [
+                  `## 📅 6 weeks before the meeting`,
+                  ``,
+                  `Phase sub-issue for: #${parentNumber}`,
+                  ``,
+                  `Refer to the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for full guidance.`,
+                  ``,
+                  `### Tasks`,
+                  ``,
+                  `- [ ] Identify a topic and speaker for the session.`,
+                  `- [ ] Send a speaker invitation using the [speaker invitation template](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/templates/speaker-invitation-email.md).`,
+                  `- [ ] Confirm speaker availability and agree a date/time (avoiding closures, public holidays, and religious observances; vary day and time from the previous meeting).`,
+                  `- [ ] Update the [planning spreadsheet](https://universityofexeteruk.sharepoint.com/:x:/r/sites/XCITEDDigitalCommunityofPractice-Organisationteam/Shared%20Documents/Organisation%20team/CoP%20Planning.xlsx?d=wdd201644d91a47bfbf46158b49c8d101&csf=1&web=1&e=SMrMDi) CoP Meetings sheet with confirmed date, time, and speaker details.`,
+                ].join('\n'),
+              },
+              {
+                label:      'community-meeting:3-weeks-before',
+                labelColor: '0075ca',
+                title:      `[3 weeks before] ${parentTitle}`,
+                body: [
+                  `## 📅 3 weeks before the meeting`,
+                  ``,
+                  `Phase sub-issue for: #${parentNumber}`,
+                  ``,
+                  `Refer to the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for full guidance.`,
+                  ``,
+                  `### Tasks`,
+                  ``,
+                  `- [ ] Finalise the webinar details (topic title, speaker bio, session format).`,
+                  `- [ ] Create the webinar event in Teams:`,
+                  `  - Open the **Calendar** app in Microsoft Teams.`,
+                  `  - Select **New webinar**.`,
+                  `  - Complete the event details using the [webinar event template](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/templates/webinar-event-template.md) as the description.`,
+                  `  - Add the speaker and planning team members as **presenters / organisers**.`,
+                  `  - Allow sharing to social media from event site.`,
+                  `  - Set event access as public.`,
+                  `  - Meeting options: Everyone can bypass the lobby; Production Tools: allow mic and camera for attendees.`,
+                  `  - Update the Theming with the X-CITED logo and banner image.`,
+                  `- [ ] Publish and share the webinar registration link.`,
+                  `  - [ ] Share with the X-CITED Digital Community.`,
+                  `- [ ] **Advertise the event across GW4:**`,
+                  `  - [ ] Post in relevant GW4 channels and networks.`,
+                  `  - [ ] Send the event details to **Nicola** to forward to the X-CITED mailing list.`,
+                  `  - [ ] Post in the X-CITED Digital Community Teams channel.`,
+                ].join('\n'),
+              },
+              {
+                label:      'community-meeting:1-week-before',
+                labelColor: 'e4e669',
+                title:      `[1 week before] ${parentTitle}`,
+                body: [
+                  `## 📅 1 week before the meeting`,
+                  ``,
+                  `Phase sub-issue for: #${parentNumber}`,
+                  ``,
+                  `Refer to the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for full guidance.`,
+                  ``,
+                  `### Tasks`,
+                  ``,
+                  `- [ ] Reach out to the speaker to confirm they can still attend and share any logistics (joining link, agenda, timing).`,
+                  `- [ ] Prepare the welcome/intro slides:`,
+                  `  - Welcome and introduction to the X-CITED Digital Community (for any new attendees).`,
+                  `  - Updates on X-CITED events and funding opportunities.`,
+                  `  - Speaker introduction.`,
+                  `  - Brief outline of the session: talk → Q&A → community discussion on the topic to facilitate networking and knowledge sharing.`,
+                  `  - QR code linking to the X-CITED mailing list sign-up page (to display at the end of the session).`,
+                  `- [ ] Prepare or update the feedback form link.`,
+                ].join('\n'),
+              },
+              {
+                label:      'community-meeting:on-the-day',
+                labelColor: 'd93f0b',
+                title:      `[On the day] ${parentTitle}`,
+                body: [
+                  `## 📅 On the day of the meeting`,
+                  ``,
+                  `Phase sub-issue for: #${parentNumber}`,
+                  ``,
+                  `Refer to the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for full guidance.`,
+                  ``,
+                  `### Tasks`,
+                  ``,
+                  `- [ ] Join the webinar 10 minutes early to greet the speaker in the green room when they arrive.`,
+                  `- [ ] Start the Webinar at the scheduled start time.`,
+                  `- [ ] Deliver the welcome/intro slides.`,
+                  `- [ ] Introduce the speaker.`,
+                  `- [ ] During the talk: monitor the chat for questions.`,
+                  `- [ ] After the talk: thank the speaker and open for Q&A.`,
+                  `- [ ] Display the mailing list QR code and invite attendees to join.`,
+                  `- [ ] Facilitate the community discussion in the second half of the session.`,
+                  `- [ ] Share the feedback form link in the chat.`,
+                ].join('\n'),
+              },
+              {
+                label:      'community-meeting:after',
+                labelColor: '0e8a16',
+                title:      `[After the meeting] ${parentTitle}`,
+                body: [
+                  `## 📅 After the meeting`,
+                  ``,
+                  `Phase sub-issue for: #${parentNumber}`,
+                  ``,
+                  `Refer to the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for full guidance.`,
+                  ``,
+                  `### Tasks`,
+                  ``,
+                  `- [ ] Add attendee list, slides, and any Mentimeter results to a meeting folder in the [shared documents](https://universityofexeteruk.sharepoint.com/:f:/r/sites/XCITEDDigitalCommunityofPractice-Organisationteam/Shared%20Documents/Organisation%20team?csf=1&web=1&e=OtGG3M).`,
+                  `- [ ] Upload recording and transcript to [Recordings](https://universityofexeteruk.sharepoint.com/:f:/r/sites/XCITEDDigitalCommunityofPractice/Shared%20Documents/General/Recordings?csf=1&web=1&e=OCAlM1).`,
+                  `- [ ] Send a follow-up message to attendees (recording link if available, feedback form, any resources shared).`,
+                  `- [ ] Send a follow-up message to the Teams channel.`,
+                  `- [ ] Review feedback form responses and note any actions for future meetings.`,
+                  `- [ ] Begin planning the next meeting.`,
+                ].join('\n'),
+              },
+            ];
+
+            // ── Ensure phase labels exist ──────────────────────────────────────
+            for (const phase of phases) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name: phase.label });
+              } catch (err) {
+                if (err.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner, repo,
+                    name:        phase.label,
+                    color:       phase.labelColor,
+                    description: `Community meeting phase: ${phase.label.replace('community-meeting:', '')}`,
+                  });
+                  console.log(`Created label: ${phase.label}`);
+                } else {
+                  throw err;
+                }
+              }
+            }
+
+            // ── Create sub-issues and optionally link them ────────────────────
+            const created = [];
+            for (const phase of phases) {
+              const { data: subIssue } = await github.rest.issues.create({
+                owner, repo,
+                title:  phase.title,
+                body:   phase.body,
+                labels: ['community-meeting', phase.label],
+              });
+              console.log(`Created sub-issue #${subIssue.number}: ${phase.title}`);
+
+              // Attempt to register as a native GitHub sub-issue (feature availability may vary)
+              try {
+                await github.request(
+                  'POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues',
+                  {
+                    owner, repo,
+                    issue_number: parentNumber,
+                    sub_issue_id: subIssue.id,
+                    headers: { 'X-GitHub-Api-Version': '2022-11-28' },
+                  }
+                );
+                console.log(`Linked #${subIssue.number} as sub-issue of #${parentNumber}`);
+              } catch (err) {
+                console.log(`Sub-issues API not available or failed: ${err.message}`);
+              }
+
+              created.push({ number: subIssue.number, title: phase.title });
+            }
+
+            // ── Leave a summary comment on the parent issue ───────────────────
+            const list = created
+              .map(({ number, title }) => {
+                const phase = title.match(/^\[(.+?)\]/)?.[1] ?? title;
+                return `- **${phase}** → #${number}`;
+              })
+              .join('\n');
+
+            await github.rest.issues.createComment({
+              owner, repo,
+              issue_number: parentNumber,
+              body: [
+                `<!-- meeting-sub-issues-created -->`,
+                `## 📋 Community Meeting Sub-Issues Created`,
+                ``,
+                `The following sub-issues have been automatically created for this meeting:`,
+                ``,
+                list,
+                ``,
+                `See the [Community Meeting Process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md) for the full planning checklist.`,
+              ].join('\n'),
+            });

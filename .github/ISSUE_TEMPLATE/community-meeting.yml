@@ -1,0 +1,63 @@
+name: 🗓️ Community Meeting
+description: >
+  Plan and track a new X-CITED Digital Community bimonthly meeting.
+  Sub-issues for each phase of the meeting process will be created automatically.
+title: "Community Meeting: [DATE] — [TOPIC]"
+labels:
+  - community-meeting
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to plan a new X-CITED Digital Community bimonthly meeting.
+
+        After submitting, a GitHub Action will automatically create sub-issues covering each phase of the [community meeting process](https://github.com/X-CITED-Digital/X-CITED_digital_community/blob/main/Processes/community-meeting-process.md):
+        - **6 weeks before** — identify topic and speaker, send invitation
+        - **3 weeks before** — set up Teams webinar, publish registration link, advertise
+        - **1 week before** — confirm speaker, prepare slides and feedback form
+        - **On the day** — run the webinar
+        - **After the meeting** — upload recordings, send follow-up messages, review feedback
+
+  - type: input
+    id: meeting-date
+    attributes:
+      label: Meeting Date
+      description: The planned date of the meeting.
+      placeholder: "e.g. Thursday 14 November 2026"
+    validations:
+      required: true
+
+  - type: input
+    id: meeting-time
+    attributes:
+      label: Meeting Time
+      description: The planned time of the meeting (UK time).
+      placeholder: "e.g. 13:00–14:00 (UK time)"
+    validations:
+      required: true
+
+  - type: input
+    id: topic-title
+    attributes:
+      label: Topic Title
+      description: The session topic title (can be updated once confirmed).
+      placeholder: "e.g. Effectively Communicating with Data"
+    validations:
+      required: false
+
+  - type: input
+    id: speaker-name
+    attributes:
+      label: Speaker Name
+      description: The speaker's full name (leave blank if not yet confirmed).
+      placeholder: "e.g. Dan Isaac"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other details relevant to this meeting cycle.
+    validations:
+      required: false
